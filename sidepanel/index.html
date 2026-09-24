@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>DeepSeek 对话存档</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header>
+    <strong>对话存档</strong>
+    <div class="row">
+      <button id="snapshot" type="button" title="后台偶尔会在流结束瞬间休眠漏抓，点这个手动补抓一次（抓进本地库，不是导出文件）">补抓本页存档</button>
+      <button id="diag" type="button" title="不工作时点它：逐项检查注入、拦截、写库哪一环断了">自检</button>
+      <button id="backup" type="button" title="把全部存档（含原始帧）导出成一个 JSON 文件，换电脑或重装浏览器后用「恢复备份」读回">备份全部</button>
+      <button id="restore" type="button" title="读回之前备份的 JSON 文件">恢复备份</button>
+      <input id="restoreFile" type="file" accept=".json,application/json" hidden />
+    </div>
+  </header>
+
+  <div id="status" class="status"></div>
+  <details id="diagBox" class="diag" hidden><summary>自检结果</summary></details>
+
+  <main>
+    <aside>
+      <ul id="sessions"></ul>
+    </aside>
+    <section>
+      <div id="detailHead" class="detail-head">选择左侧会话查看</div>
+      <div class="row" id="detailActions" hidden>
+        <button id="exportAll" type="button">导出 Markdown（含思考）</button>
+        <button id="exportLean" type="button">仅导出回答</button>
+        <button id="drop" type="button" class="danger">删除</button>
+      </div>
+      <div id="rawList" class="rawlist" hidden></div>
+      <div id="recovered" hidden></div>
+      <div id="detail" class="detail"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

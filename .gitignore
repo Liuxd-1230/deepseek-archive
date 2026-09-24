@@ -1,0 +1,8 @@
+# 本地备份文件（含完整对话内容，绝不能进仓库）
+deepseek-archive-*.json
+
+# 系统/编辑器杂物
+node_modules/
+Thumbs.db
+.DS_Store
+*.log
