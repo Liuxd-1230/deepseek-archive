@@ -4,6 +4,9 @@ export const KNOWN_FRAGMENT_TYPES = new Set(['REQUEST', 'THINK', 'RESPONSE', 'TO
 export function normalizeMessages(sessionId, chatMessages) {
   return chatMessages.map(m => {
     const fragments = (m.fragments || []).map(f => ({
+      // 实测：TOOL_SEARCH / TOOL_OPEN 的载荷不在已知字段里。原样全留，
+      // 一个字段都不丢——字段结构没摸清前，丢字段比存冗余可怕得多
+      ...f,
       id: f.id,
       type: f.type,
       content: f.content || '',

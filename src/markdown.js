@@ -8,6 +8,8 @@ function renderReferences(refs) {
     if (typeof r !== 'object' || r === null) return `${i + 1}. ${r}`;
     const title = r.title || r.name || r.url || '';
     const url = r.url || '';
+    // 引用对象的字段名还没摸清（实测 title/url 全空），认不出就原样亮出来，别渲染成空行
+    if (!title && !url) return `${i + 1}. ${JSON.stringify(r)}`;
     return `${i + 1}. ${title}${url && url !== title ? ` — ${url}` : ''}`;
   }).join('\n');
 }
@@ -49,7 +51,8 @@ export function buildMarkdown(session, messages, { includeThinking = true } = {}
       } else if (f.type === 'TIP') {
         continue; // 固定提示语（"内容由 AI 生成…"），库里和原始帧里都留着，导出就不带噪音了
       } else if (f.type === 'TOOL_SEARCH' || f.type === 'TOOL_OPEN') {
-        out.push(rawBlock(`${f.type} #${f.id}`, { content: f.content || undefined, references: f.references || undefined }));
+        // 字段结构还没摸清（实测载荷不在 content/references 里），整个 fragment 倒出来
+        out.push(rawBlock(`${f.type} #${f.id}`, f));
       } else {
         out.push(rawBlock(`未识别的 fragment 类型 ${f.type}`, { id: f.id, content: f.content, references: f.references }));
       }
