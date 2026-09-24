@@ -66,6 +66,10 @@ aside { border-right: 1px solid var(--line); }
 
 .live-meta { color: var(--dim); font-size: 11px; margin-bottom: 4px; }
 .tip { color: var(--dim); font-size: 11px; margin: 4px 2px 0; }
+.refline { font-size: 12px; margin: 3px 2px; }
+.refline a { color: var(--accent); text-decoration: none; word-break: break-all; }
+.refline a:hover { text-decoration: underline; }
+.refsrc { color: var(--dim); }
 
 .rawlist { margin: 0 12px 12px; border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
 .rawline { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; cursor: pointer; font-size: 12px; border-top: 1px solid var(--line); }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DeepSeek 对话存档",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "自动存档 DeepSeek 对话（含思考全文与原始 Markdown），被过滤的内容也能找回。数据只存在本地，可导出、可备份。",
   "permissions": ["storage", "unlimitedStorage", "webRequest", "sidePanel"],
   "host_permissions": ["https://chat.deepseek.com/*"],

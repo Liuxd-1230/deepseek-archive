@@ -71,6 +71,18 @@ async function refreshSessions() {
   }
 }
 
+// 一条搜索结果/引用 → 链接行（标题可点，来源灰字跟在后面）
+function linkLine(r) {
+  const div = el('div', 'refline');
+  const a = el('a', null, r.title || r.url || '(无标题)');
+  a.href = r.url || '#';
+  a.target = '_blank';
+  a.rel = 'noreferrer';
+  div.appendChild(a);
+  if (r.site_name) div.appendChild(el('span', 'refsrc', ` — ${r.site_name}`));
+  return div;
+}
+
 async function select(sessionId) {
   current = sessionId;
   hasSelection = true;
@@ -92,15 +104,47 @@ async function select(sessionId) {
     const chips = el('div', 'chips');
     for (const f of m.fragments) {
       if (f.type === 'TIP') continue; // 固定提示语，不值得占一个 chip
-      chips.appendChild(el('span', `chip t-${f.type}`, `${f.type} ${f.content.length}`));
+      const label = f.type === 'TOOL_SEARCH' ? `🔍 ${(f.results || []).length} 条结果`
+        : f.type === 'TOOL_OPEN' ? '📄 打开网页'
+        : `${f.type} ${f.content.length}`;
+      chips.appendChild(el('span', `chip t-${f.type}`, label));
     }
     if (m.tokenUsage != null) chips.appendChild(el('span', 'chip meta-chip', `${m.tokenUsage} tok`));
     if (m.searchTriggered) chips.appendChild(el('span', 'chip meta-chip', '联网'));
     card.appendChild(chips);
 
+    // 引用是 {id,type} 指针，按 id 在同一条消息的 fragment 里找回真实来源
+    const byId = new Map(m.fragments.map(f => [f.id, f]));
     for (const f of m.fragments) {
-      // TIP 是"内容由 AI 生成"那种固定提示语，压成一行灰字；其余正文照常
-      card.appendChild(f.type === 'TIP' ? el('div', 'tip', f.content) : el('pre', 'body', f.content));
+      if (f.type === 'TIP') {
+        // TIP 是"内容由 AI 生成"那种固定提示语，压成一行灰字
+        card.appendChild(el('div', 'tip', f.content));
+      } else if (f.type === 'TOOL_SEARCH') {
+        const qs = (f.queries || []).map(q => q.query).filter(Boolean);
+        const results = Array.isArray(f.results) ? f.results : [];
+        card.appendChild(el('div', 'tip', `🔍 搜索：${qs.join('；') || f.content}`));
+        if (results.length) {
+          const det = el('details');
+          det.appendChild(el('summary', null, `搜索结果 ${results.length} 条`));
+          for (const r of results) det.appendChild(linkLine(r));
+          card.appendChild(det);
+        }
+      } else if (f.type === 'TOOL_OPEN') {
+        card.appendChild(linkLine(f.result || {}));
+      } else {
+        card.appendChild(el('pre', 'body', f.content));
+        if (f.type === 'RESPONSE' && Array.isArray(f.references) && f.references.length) {
+          const det = el('details');
+          det.appendChild(el('summary', null, `引用来源 ${f.references.length} 条`));
+          f.references.forEach((r, i) => {
+            const t = r && byId.get(r.id);
+            const res = t && t.result;
+            if (res && res.url) det.appendChild(linkLine(res));
+            else if (t && t.type === 'TOOL_SEARCH') det.appendChild(el('div', 'refline', `${i + 1}. 联网搜索结果 ${(t.results || []).length} 条`));
+          });
+          card.appendChild(det);
+        }
+      }
     }
 
     const flags = [];
